@@ -4,6 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OCC4.1 Aircraft System Calendar</title>
+    <meta name="description" content="Subscribe to the OCC4.1 Aircraft System training schedule in your calendar app.">
+    <link rel="canonical" href="https://bankgg.github.io/tgocc4-1/calendar-ac-system.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="OCC4.1 Training Calendar">
+    <meta property="og:url" content="https://bankgg.github.io/tgocc4-1/calendar-ac-system.html">
+    <meta property="og:title" content="OCC4.1 Aircraft System Calendar">
+    <meta property="og:description" content="Tap to subscribe to the OCC4.1 Aircraft System training schedule in Apple Calendar, Google Calendar, or another calendar app.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="OCC4.1 Aircraft System Calendar">
+    <meta name="twitter:description" content="Tap to subscribe to the OCC4.1 Aircraft System training schedule in your calendar app.">
     <style>
       :root {
         color-scheme: light;
@@ -67,15 +77,36 @@
     </main>
 
     <script>
-      const httpsUrl = "https://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
+      const icsUrl = "https://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
       const webcalUrl = "webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
+      const googleCalendarUrl =
+        "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(icsUrl);
+      const chromeIntentUrl =
+        "intent://calendar.google.com/calendar/render?cid=" +
+        encodeURIComponent(icsUrl) +
+        "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
+        encodeURIComponent(googleCalendarUrl) +
+        ";end";
+
+      const isAndroid = /Android/i.test(navigator.userAgent);
 
       document.getElementById("add-calendar").addEventListener("click", () => {
+        if (isAndroid) {
+          window.location.href = chromeIntentUrl;
+
+          window.setTimeout(() => {
+            if (!document.hidden) {
+              window.location.href = googleCalendarUrl;
+            }
+          }, 900);
+          return;
+        }
+
         window.location.href = webcalUrl;
 
         window.setTimeout(() => {
           if (!document.hidden) {
-            window.location.href = httpsUrl;
+            window.location.href = icsUrl;
           }
         }, 1200);
       });
