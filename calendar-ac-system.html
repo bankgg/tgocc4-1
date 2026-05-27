@@ -68,37 +68,68 @@
         font-size: 14px;
         line-height: 1.45;
       }
+
+      .manual {
+        display: none;
+        margin-top: 18px;
+      }
+
+      .manual.is-visible {
+        display: block;
+      }
+
+      code {
+        display: block;
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #263449;
+        font-family: Consolas, Monaco, monospace;
+        font-size: 12px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+        box-shadow: inset 0 0 0 1px #d9e0ec;
+      }
     </style>
   </head>
   <body>
     <main>
       <button type="button" id="add-calendar">Add to Calendar</button>
       <p>Add the OCC4.1 Aircraft System training schedule to your calendar app.</p>
+      <p class="manual" id="manual-help">
+        If Android does not open Google Calendar, copy this calendar URL and add it from Google Calendar on a computer.
+        <code id="calendar-url">webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics</code>
+      </p>
     </main>
 
     <script>
       const icsUrl = "https://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
       const webcalUrl = "webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
-      const androidWebcalIntentUrl =
-        "intent://bankgg.github.io/tgocc4-1/calendar-ac-system.ics" +
-        "#Intent;scheme=webcal;action=android.intent.action.VIEW;" +
-        "category=android.intent.category.BROWSABLE;end";
-      const androidCalendarFileIntentUrl =
-        "intent://bankgg.github.io/tgocc4-1/calendar-ac-system.ics" +
-        "#Intent;scheme=https;action=android.intent.action.VIEW;type=text/calendar;" +
-        "category=android.intent.category.BROWSABLE;S.browser_fallback_url=" +
-        encodeURIComponent(icsUrl) +
+      const googleCalendarUrl =
+        "https://calendar.google.com/calendar/u/0/r/settings/addbyurl?cid=" + encodeURIComponent(webcalUrl);
+      const chromeGoogleCalendarUrl =
+        "intent://calendar.google.com/calendar/u/0/r/settings/addbyurl?cid=" +
+        encodeURIComponent(webcalUrl) +
+        "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
+        encodeURIComponent(googleCalendarUrl) +
         ";end";
 
       const isAndroid = /Android/i.test(navigator.userAgent);
+      const manualHelp = document.getElementById("manual-help");
+
+      if (isAndroid) {
+        manualHelp.classList.add("is-visible");
+      }
 
       document.getElementById("add-calendar").addEventListener("click", () => {
         if (isAndroid) {
-          window.location.href = androidWebcalIntentUrl;
+          navigator.clipboard?.writeText(webcalUrl).catch(() => {});
+          window.location.href = chromeGoogleCalendarUrl;
 
           window.setTimeout(() => {
             if (!document.hidden) {
-              window.location.href = androidCalendarFileIntentUrl;
+              window.location.href = googleCalendarUrl;
             }
           }, 900);
           return;
