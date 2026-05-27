@@ -63,13 +63,9 @@
       }
 
       .button-row {
-        display: none;
+        display: grid;
         gap: 10px;
         margin-top: 12px;
-      }
-
-      .button-row.is-visible {
-        display: grid;
       }
 
       .secondary {
@@ -111,23 +107,32 @@
   </head>
   <body>
     <main>
-      <button type="button" id="add-calendar">Add to Calendar</button>
+      <button type="button" id="apple-calendar">Subscribe in Apple Calendar</button>
       <p id="context-text">Add the OCC4.1 Aircraft System training schedule to your calendar app.</p>
       <div class="button-row" id="android-actions">
-        <button type="button" class="secondary" id="download-ics">Download ICS</button>
+        <button type="button" class="secondary" id="google-calendar">Add to Google Calendar</button>
         <button type="button" class="secondary" id="copy-url">Copy Calendar URL</button>
       </div>
       <p class="manual" id="manual-help">
-        Android users in LINE should open this page in their browser first. In Chrome or Samsung Internet, use Add to Calendar for Google Calendar subscription, or Download ICS to import a copy.
-        <code id="calendar-url">webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics</code>
+        Android users in LINE should open this page in their browser first, then use Add to Google Calendar.
+        <code id="calendar-url">webcal://calendar.google.com/calendar/ical/9541c45403eeb859446e7728f24c06f116c116c474f0da19c6735994f504e7d2%40group.calendar.google.com/public/basic.ics</code>
       </p>
     </main>
 
     <script>
-      const icsUrl = "https://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
-      const webcalUrl = "webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
-      const googleCalendarUrl =
-        "https://calendar.google.com/calendar/u/0/r/settings/addbyurl?cid=" + encodeURIComponent(webcalUrl);
+      const googleCalendarCid =
+        "OTU0MWM0NTQwM2VlYjg1OTQ0NmU3NzI4ZjI0YzA2ZjExNmMxMTZjNDc0ZjBkYTE5YzY3MzU5OTRmNTA0ZTdkMkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t";
+      const icsUrl =
+        "https://calendar.google.com/calendar/ical/9541c45403eeb859446e7728f24c06f116c116c474f0da19c6735994f504e7d2%40group.calendar.google.com/public/basic.ics";
+      const webcalUrl =
+        "webcal://calendar.google.com/calendar/ical/9541c45403eeb859446e7728f24c06f116c116c474f0da19c6735994f504e7d2%40group.calendar.google.com/public/basic.ics";
+      const googleCalendarUrl = "https://calendar.google.com/calendar/u/0/r?cid=" + googleCalendarCid;
+      const googleCalendarIntentUrl =
+        "intent://calendar.google.com/calendar/u/0/r?cid=" +
+        googleCalendarCid +
+        "#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=" +
+        encodeURIComponent(googleCalendarUrl) +
+        ";end";
       const pageUrl = "https://bankgg.github.io/tgocc4-1/calendar-ac-system.html";
       const externalBrowserUrl =
         "intent://bankgg.github.io/tgocc4-1/calendar-ac-system.html" +
@@ -137,36 +142,23 @@
         ";end";
       const isAndroid = /Android/i.test(navigator.userAgent);
       const isLine = /Line\//i.test(navigator.userAgent);
-      const addCalendar = document.getElementById("add-calendar");
+      const appleCalendar = document.getElementById("apple-calendar");
+      const googleCalendar = document.getElementById("google-calendar");
       const contextText = document.getElementById("context-text");
       const manualHelp = document.getElementById("manual-help");
-      const androidActions = document.getElementById("android-actions");
-      const downloadIcs = document.getElementById("download-ics");
       const copyUrl = document.getElementById("copy-url");
 
       if (isAndroid) {
         manualHelp.classList.add("is-visible");
-        androidActions.classList.add("is-visible");
       }
 
       if (isAndroid && isLine) {
-        addCalendar.textContent = "Open in Browser First";
+        googleCalendar.textContent = "Open in Browser First";
         contextText.textContent =
-          "LINE's browser cannot add this calendar directly. Open this page in your browser, then add it there.";
+          "LINE's browser cannot add this calendar directly on Android. Open this page in your browser, then add it there.";
       }
 
-      addCalendar.addEventListener("click", () => {
-        if (isAndroid) {
-          if (isLine) {
-            window.location.href = externalBrowserUrl;
-            return;
-          }
-
-          navigator.clipboard?.writeText(webcalUrl).catch(() => {});
-          window.location.href = googleCalendarUrl;
-          return;
-        }
-
+      appleCalendar.addEventListener("click", () => {
         window.location.href = webcalUrl;
 
         window.setTimeout(() => {
@@ -176,8 +168,18 @@
         }, 1200);
       });
 
-      downloadIcs.addEventListener("click", () => {
-        window.location.href = icsUrl;
+      googleCalendar.addEventListener("click", () => {
+        if (isAndroid && isLine) {
+          window.location.href = externalBrowserUrl;
+          return;
+        }
+
+        if (isAndroid) {
+          window.location.href = googleCalendarIntentUrl;
+          return;
+        }
+
+        window.location.href = googleCalendarUrl;
       });
 
       copyUrl.addEventListener("click", async () => {
