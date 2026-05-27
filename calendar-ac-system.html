@@ -62,6 +62,22 @@
         outline-offset: 3px;
       }
 
+      .button-row {
+        display: none;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .button-row.is-visible {
+        display: grid;
+      }
+
+      .secondary {
+        background: #ffffff;
+        color: #184f9c;
+        box-shadow: inset 0 0 0 1px #bfd0e7;
+      }
+
       p {
         margin: 14px 0 0;
         color: #566174;
@@ -96,9 +112,13 @@
   <body>
     <main>
       <button type="button" id="add-calendar">Add to Calendar</button>
-      <p>Add the OCC4.1 Aircraft System training schedule to your calendar app.</p>
+      <p id="context-text">Add the OCC4.1 Aircraft System training schedule to your calendar app.</p>
+      <div class="button-row" id="android-actions">
+        <button type="button" class="secondary" id="download-ics">Download ICS</button>
+        <button type="button" class="secondary" id="copy-url">Copy Calendar URL</button>
+      </div>
       <p class="manual" id="manual-help">
-        If Android does not open Google Calendar, copy this calendar URL and add it from Google Calendar on a computer.
+        Android users in LINE should open this page in their browser first. In Chrome or Samsung Internet, use Add to Calendar for Google Calendar subscription, or Download ICS to import a copy.
         <code id="calendar-url">webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics</code>
       </p>
     </main>
@@ -108,30 +128,42 @@
       const webcalUrl = "webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
       const googleCalendarUrl =
         "https://calendar.google.com/calendar/u/0/r/settings/addbyurl?cid=" + encodeURIComponent(webcalUrl);
-      const chromeGoogleCalendarUrl =
-        "intent://calendar.google.com/calendar/u/0/r/settings/addbyurl?cid=" +
-        encodeURIComponent(webcalUrl) +
-        "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
-        encodeURIComponent(googleCalendarUrl) +
+      const pageUrl = "https://bankgg.github.io/tgocc4-1/calendar-ac-system.html";
+      const externalBrowserUrl =
+        "intent://bankgg.github.io/tgocc4-1/calendar-ac-system.html" +
+        "#Intent;scheme=https;action=android.intent.action.VIEW;" +
+        "category=android.intent.category.BROWSABLE;S.browser_fallback_url=" +
+        encodeURIComponent(pageUrl) +
         ";end";
-
       const isAndroid = /Android/i.test(navigator.userAgent);
+      const isLine = /Line\//i.test(navigator.userAgent);
+      const addCalendar = document.getElementById("add-calendar");
+      const contextText = document.getElementById("context-text");
       const manualHelp = document.getElementById("manual-help");
+      const androidActions = document.getElementById("android-actions");
+      const downloadIcs = document.getElementById("download-ics");
+      const copyUrl = document.getElementById("copy-url");
 
       if (isAndroid) {
         manualHelp.classList.add("is-visible");
+        androidActions.classList.add("is-visible");
       }
 
-      document.getElementById("add-calendar").addEventListener("click", () => {
-        if (isAndroid) {
-          navigator.clipboard?.writeText(webcalUrl).catch(() => {});
-          window.location.href = chromeGoogleCalendarUrl;
+      if (isAndroid && isLine) {
+        addCalendar.textContent = "Open in Browser First";
+        contextText.textContent =
+          "LINE's browser cannot add this calendar directly. Open this page in your browser, then add it there.";
+      }
 
-          window.setTimeout(() => {
-            if (!document.hidden) {
-              window.location.href = googleCalendarUrl;
-            }
-          }, 900);
+      addCalendar.addEventListener("click", () => {
+        if (isAndroid) {
+          if (isLine) {
+            window.location.href = externalBrowserUrl;
+            return;
+          }
+
+          navigator.clipboard?.writeText(webcalUrl).catch(() => {});
+          window.location.href = googleCalendarUrl;
           return;
         }
 
@@ -142,6 +174,22 @@
             window.location.href = icsUrl;
           }
         }, 1200);
+      });
+
+      downloadIcs.addEventListener("click", () => {
+        window.location.href = icsUrl;
+      });
+
+      copyUrl.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(webcalUrl);
+          copyUrl.textContent = "Copied";
+          window.setTimeout(() => {
+            copyUrl.textContent = "Copy Calendar URL";
+          }, 1600);
+        } catch {
+          copyUrl.textContent = "Copy the URL Below";
+        }
       });
     </script>
   </body>
