@@ -79,24 +79,26 @@
     <script>
       const icsUrl = "https://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
       const webcalUrl = "webcal://bankgg.github.io/tgocc4-1/calendar-ac-system.ics";
-      const googleCalendarUrl =
-        "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(icsUrl);
-      const chromeIntentUrl =
-        "intent://calendar.google.com/calendar/render?cid=" +
+      const androidWebcalIntentUrl =
+        "intent://bankgg.github.io/tgocc4-1/calendar-ac-system.ics" +
+        "#Intent;scheme=webcal;action=android.intent.action.VIEW;" +
+        "category=android.intent.category.BROWSABLE;end";
+      const androidCalendarFileIntentUrl =
+        "intent://bankgg.github.io/tgocc4-1/calendar-ac-system.ics" +
+        "#Intent;scheme=https;action=android.intent.action.VIEW;type=text/calendar;" +
+        "category=android.intent.category.BROWSABLE;S.browser_fallback_url=" +
         encodeURIComponent(icsUrl) +
-        "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
-        encodeURIComponent(googleCalendarUrl) +
         ";end";
 
       const isAndroid = /Android/i.test(navigator.userAgent);
 
       document.getElementById("add-calendar").addEventListener("click", () => {
         if (isAndroid) {
-          window.location.href = chromeIntentUrl;
+          window.location.href = androidWebcalIntentUrl;
 
           window.setTimeout(() => {
             if (!document.hidden) {
-              window.location.href = googleCalendarUrl;
+              window.location.href = androidCalendarFileIntentUrl;
             }
           }, 900);
           return;
