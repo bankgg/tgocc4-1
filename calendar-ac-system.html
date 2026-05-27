@@ -62,61 +62,18 @@
         outline-offset: 3px;
       }
 
-      .button-row {
-        display: grid;
-        gap: 10px;
-        margin-top: 12px;
-      }
-
-      .secondary {
-        background: #ffffff;
-        color: #184f9c;
-        box-shadow: inset 0 0 0 1px #bfd0e7;
-      }
-
       p {
         margin: 14px 0 0;
         color: #566174;
         font-size: 14px;
         line-height: 1.45;
       }
-
-      .manual {
-        display: none;
-        margin-top: 18px;
-      }
-
-      .manual.is-visible {
-        display: block;
-      }
-
-      code {
-        display: block;
-        margin-top: 10px;
-        padding: 12px;
-        border-radius: 8px;
-        background: #ffffff;
-        color: #263449;
-        font-family: Consolas, Monaco, monospace;
-        font-size: 12px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-        box-shadow: inset 0 0 0 1px #d9e0ec;
-      }
     </style>
   </head>
   <body>
     <main>
-      <button type="button" id="apple-calendar">Subscribe in Apple Calendar</button>
+      <button type="button" id="calendar-action">Subscribe in Calendar</button>
       <p id="context-text">Add the OCC4.1 Aircraft System training schedule to your calendar app.</p>
-      <div class="button-row" id="android-actions">
-        <button type="button" class="secondary" id="google-calendar">Add to Google Calendar</button>
-        <button type="button" class="secondary" id="copy-url">Copy Calendar URL</button>
-      </div>
-      <p class="manual" id="manual-help">
-        Android users in LINE should open this page in their browser first, then use Add to Google Calendar.
-        <code id="calendar-url">webcal://calendar.google.com/calendar/ical/9541c45403eeb859446e7728f24c06f116c116c474f0da19c6735994f504e7d2%40group.calendar.google.com/public/basic.ics</code>
-      </p>
     </main>
 
     <script>
@@ -142,33 +99,16 @@
         ";end";
       const isAndroid = /Android/i.test(navigator.userAgent);
       const isLine = /Line\//i.test(navigator.userAgent);
-      const appleCalendar = document.getElementById("apple-calendar");
-      const googleCalendar = document.getElementById("google-calendar");
+      const calendarAction = document.getElementById("calendar-action");
       const contextText = document.getElementById("context-text");
-      const manualHelp = document.getElementById("manual-help");
-      const copyUrl = document.getElementById("copy-url");
-
-      if (isAndroid) {
-        manualHelp.classList.add("is-visible");
-      }
 
       if (isAndroid && isLine) {
-        googleCalendar.textContent = "Open in Browser First";
+        calendarAction.textContent = "Open in Browser";
         contextText.textContent =
-          "LINE's browser cannot add this calendar directly on Android. Open this page in your browser, then add it there.";
+          "LINE's browser cannot add this calendar directly on Android. Open it in your browser first, then subscribe there.";
       }
 
-      appleCalendar.addEventListener("click", () => {
-        window.location.href = webcalUrl;
-
-        window.setTimeout(() => {
-          if (!document.hidden) {
-            window.location.href = icsUrl;
-          }
-        }, 1200);
-      });
-
-      googleCalendar.addEventListener("click", () => {
+      calendarAction.addEventListener("click", () => {
         if (isAndroid && isLine) {
           window.location.href = externalBrowserUrl;
           return;
@@ -179,19 +119,13 @@
           return;
         }
 
-        window.location.href = googleCalendarUrl;
-      });
+        window.location.href = webcalUrl;
 
-      copyUrl.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(webcalUrl);
-          copyUrl.textContent = "Copied";
-          window.setTimeout(() => {
-            copyUrl.textContent = "Copy Calendar URL";
-          }, 1600);
-        } catch {
-          copyUrl.textContent = "Copy the URL Below";
-        }
+        window.setTimeout(() => {
+          if (!document.hidden) {
+            window.location.href = icsUrl;
+          }
+        }, 1200);
       });
     </script>
   </body>
